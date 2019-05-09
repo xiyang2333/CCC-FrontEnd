@@ -57,16 +57,16 @@ function ProductHero(props) {
                 {/* Increase the network loading priority of the background image. */}
                 <img style={{ display: 'none' }} src={Background} alt="" />
                 <Typography color="inherit" align="center" variant="h2" marked="center">
-                    Wrath and Envy Research in VIC
+                    Wrath Research in VIC
                 </Typography>
                 <Typography color="inherit" align="center" variant="h4" className={classes.h5}>
                     Group 41<br />
                 </Typography>
                 <Typography color="inherit" align="center" variant="h5">
-                    ***<br />
-                    ***<br />
                     Junyi Shi<br />
+                    Ruitong Liu<br />
                     Xi Yang<br />
+                    Yinbo Li<br />
                     Zhaoqi Fang<br />
                 </Typography>
             </ProductHeroLayout>

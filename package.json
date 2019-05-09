@@ -11,7 +11,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@antv/data-set": "^0.10.2",
     "@material-ui/core": "^3.9.3",
+    "bizcharts": "^3.5.2",
     "es6-promise": "^4.2.5",
     "react": "^16.3.0",
     "react-dom": "^16.3.0",

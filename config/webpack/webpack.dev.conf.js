@@ -43,7 +43,7 @@ let config = merge(baseWebpackConfig, {
     /*设置api转发*/
     devServer: {
         host: '0.0.0.0',
-        port: 8080,
+        port: 12345,
         hot: true,
         inline: true,
         contentBase: path.resolve(webpackFile.devDirectory),
@@ -52,7 +52,7 @@ let config = merge(baseWebpackConfig, {
         proxy: [
             {
                 context: ['/api/**', '/u/**'],
-                target: 'http://192.168.12.100:8080/',
+                target: 'http://192.168.12.100:12345/',
                 secure: false
             }
         ],
