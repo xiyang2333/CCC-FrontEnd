@@ -4,6 +4,7 @@ import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import Map from "./map/Map"
 import Home from "./home/Home"
+import Chart from "./chart/Chart"
 
 
 class Index extends React.Component {
@@ -63,7 +64,7 @@ class Index extends React.Component {
                     view_type == "map" ? (<Map />) : null
                 }
                 {
-                    view_type == "chart" ? (<div>chart</div>) : null
+                    view_type == "chart" ? (<Chart />) : null
                 }
             </div>
         );

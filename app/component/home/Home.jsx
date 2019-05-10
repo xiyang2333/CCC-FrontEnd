@@ -1,25 +1,3 @@
-// import React from "react"
-// import Background from '../../public/15564477025.jpg';
-
-// var sectionStyle = {
-//     position: 'absolute',
-//     top: '0',
-//     width: '100%',
-//     height: '100%',
-//     zIndex: '3',
-//     backgroundImage:'url(${Background})'
-// };
-
-// class Home extends React.Component {
-
-//     render() {
-//         return (
-//             <div style={{ sectionStyle }}></div>
-//         )
-//     }
-// }
-// export default Home
-
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';

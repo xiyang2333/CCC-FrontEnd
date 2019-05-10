@@ -36,13 +36,14 @@ const styles = {
         marginRight: '20px',
         height: '200px',
         width: '10px',
-        background: 'linear-gradient(#fff, #f00)',
+        background: 'linear-gradient(#ffffff, #ff142c)',
         display:'inline-block'
     }
 };
 
 const MyMapComponent = compose(
     withProps({
+        // googleMapURL: "https://maps.googleapis.com/maps/api/js?key=AIzaSyBzePKpJhMUNanb890R2sYaUF6zDWJGUcI&v=3.exp&libraries=geometry,drawing,places",
         googleMapURL: "https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places",
         loadingElement: <div style={{ height: `100%` }} />,
         containerElement: <div style={{ height: `800px` }} />,
@@ -58,14 +59,40 @@ const MyMapComponent = compose(
         >
             {
                 props.pathsArray.map(function (value, index) {
+                    let start = "#ffffff";
+                    let end = "#ff142c";
+                    let max = props.max;
+                    let min = props.min;
+
+                    let color = start;
+                    if(value.count != 0){
+                        // color = start - (value.sum / value.count - min) / (max - min) * (start - end);
+                        let s_r =parseInt(start.substr(1,2), 16);
+                        let s_g =parseInt(start.substr(3,2), 16);
+                        let s_b =parseInt(start.substr(5,2), 16);
+                        let e_r =parseInt(end.substr(1,2), 16);
+                        let e_g =parseInt(end.substr(3,2), 16);
+                        let e_b =parseInt(end.substr(5,2), 16);
+                        let radio = (value.sum / value.count - min) / (max - min);
+    
+                        let c_r = s_r + radio * (e_r - s_r);
+                        let c_g = s_g + radio * (e_g - s_g);
+                        let c_b = s_b + radio * (e_b - s_b);
+    
+                        color = "#" + Math.round(c_r).toString(16) + Math.round(c_g).toString(16) + Math.round(c_b).toString(16)
+                    } 
+                    // color = "#" + Math.round(color).toString(16);
+                    // console.log(value.code + "   " + color);
+                
+
                     return (
                         <div>
                             <Polygon
                                 paths={value.paths}
-                                onClick={props.polygonClick.bind(this, value.code, value.name)}
+                                onClick={props.polygonClick.bind(this, value)}
                                 options={{
-                                    strokeColor: "#d34052",
-                                    fillColor: "#d34052",
+                                    strokeColor: color,
+                                    fillColor: color,
                                     strokeOpacity: "0.5",
                                     strokeWeight: '2'
                                 }}
@@ -102,49 +129,28 @@ class Map extends React.PureComponent {
     }
 
     polygonDraw = () => {
-        let pathsArray = [];
-
-        geoData.features.map(function (value, index) {
-            if (value.geometry) {
-                if (value.geometry.type == "Polygon") {
-                    let geoPath = [];
-                    value.geometry.coordinates[0].map(function (valueC, indexC) {
-                        let geo = { lng: valueC[0], lat: valueC[1] };
-                        geoPath.push(geo);
-                    })
-                    let code = value.properties.SA4_CODE16;
-                    let name = value.properties.SA4_NAME;
-                    pathsArray.push({code : code, paths: geoPath, name : name});
-                } else if (value.geometry.type == "MultiPolygon") {
-                    let code = value.properties.SA4_CODE16;
-                    let name = value.properties.SA4_NAME;
-                    value.geometry.coordinates.map(function (valueC, indexC) {
-                        let geoPath = [];
-                        valueC[0].map(function (valueMC, indexMC) {
-                            let geo = { lng: valueMC[0], lat: valueMC[1] };
-                            geoPath.push(geo);
-                        })
-                        pathsArray.push({code : code, paths: geoPath, name : name});
-                    })
-                }
-            }
-        })
-        console.log(pathsArray);
         this.setState({
             pathsArray: pathsArray
         })
     }
 
     componentDidMount() {
-        this.polygonDraw();
+        let viewURL ="http://172.26.38.89:5984/tagged_twit/_design/angerviewdoc/_view/anger-view?group=true";
+        fetch(viewURL).then(res => {
+            res.json().then((dataJson) => {
+                this.setState({
+                    stateData: dataJson
+                });
+            })
+        })
     }
 
-    polygonClick = (code, name, e) => {
-        console.log(code);
+    polygonClick = (state, e) => {
+        console.log(state.code);
 
         let value = [];
         for(var a in incomeData){
-            if(a == code){
+            if(a == state.code){
                 value = incomeData[a];
             }
         }
@@ -180,9 +186,10 @@ class Map extends React.PureComponent {
         let ilng = e.latLng.lng();
         let info = (
         <div>
-            SA4 Code: {code}<br/>
-            SA4 Name: {name}<br/>
-            Total Twitter Post: (TODO)<br />
+            SA4 Code: {state.code}<br/>
+            SA4 Name: {state.name}<br/>
+            Total Twitter Post: {state.count}<br />
+            Total Anger Twitter Post: {state.sum}<br />
             Total Income: {sum} <br />
             Weekly Income Information: <br/>
             <Labelline 
@@ -191,7 +198,7 @@ class Map extends React.PureComponent {
         </div>);
         this.setState({
             show: true,
-            code : code,
+            code : state.code,
             showInfo : info,
             position: { lng: ilng, lat: ilat }
         })
@@ -202,10 +209,73 @@ class Map extends React.PureComponent {
             show: false
         })
     }
+    
+    calculatCount = (stateData, code) =>{
+        let count = 0;
+        let sum = 0;
+        if(stateData != undefined){
+            stateData.rows.map(function(stateValue,stateIndex){
+                if(stateValue.key == code){
+                    count = stateValue.value.count;
+                    sum = stateValue.value.sum;
+                }
+            })
+        }
+        return {count: count, sum: sum};
+    }
 
     render() {
-        let { pathsArray, show, position,showInfo } = this.state;
+        let { show, position,showInfo } = this.state;
         const { classes } = this.props;
+
+        let pathsArray = [];
+        let min = 1;
+        let max = 0;
+
+        let stateData = this.state.stateData;
+        console.log(stateData);
+
+        let _this = this;
+        geoData.features.map(function (value, index) {
+            if (value.geometry) {
+                if (value.geometry.type == "Polygon") {
+                    let geoPath = [];
+                    value.geometry.coordinates[0].map(function (valueC, indexC) {
+                        let geo = { lng: valueC[0], lat: valueC[1] };
+                        geoPath.push(geo);
+                    })
+                    let code = value.properties.SA4_CODE16;
+                    let name = value.properties.SA4_NAME;
+                    let twidata = _this.calculatCount(stateData,code);
+                    if(twidata.sum / twidata.count < min){
+                        min = twidata.sum / twidata.count 
+                    }
+                    if(twidata.sum / twidata.count > max){
+                        max = twidata.sum / twidata.count 
+                    }
+                    pathsArray.push({code : code, paths: geoPath, name : name,  sum : twidata.sum, count: twidata.count});
+                } else if (value.geometry.type == "MultiPolygon") {
+                    let code = value.properties.SA4_CODE16;
+                    let twidata = _this.calculatCount(stateData,code);
+                    let name = value.properties.SA4_NAME;
+                    if(twidata.sum / twidata.count < min){
+                        min = twidata.sum / twidata.count 
+                    }
+                    if(twidata.sum / twidata.count > max){
+                        max = twidata.sum / twidata.count 
+                    }
+                    value.geometry.coordinates.map(function (valueC, indexC) {
+                        let geoPath = [];
+                        valueC[0].map(function (valueMC, indexMC) {
+                            let geo = { lng: valueMC[0], lat: valueMC[1] };
+                            geoPath.push(geo);
+                        })
+                        pathsArray.push({code : code, paths: geoPath, name : name, sum : twidata.sum, count: twidata.count});
+                    })
+                }
+            }
+        })
+        console.log(pathsArray);
 
         return (
             <div stle={{ positon: 'relative' }}>
@@ -216,6 +286,8 @@ class Map extends React.PureComponent {
                     showInfo={showInfo}
                     position={position}
                     closeWindow={this.closeWindow}
+                    min = {min}
+                    max = {max}
                 />
                 <div style={{ position: 'absolute', top: '50px', right: '300px', width: '50px', height: '50px' }}>
                     <Card className={classes.card}>
@@ -227,12 +299,12 @@ class Map extends React.PureComponent {
                                         <div className={classes.gradient}>
                                         </div>
                                         </td>
-                                        <td valign="top">min</td>
+                                        <td valign="top">AVG: {min}</td>
                                     </tr>
                                     <tr><td></td></tr>
                                     <tr><td></td></tr>
                                     <tr>
-                                        <td valign="bottom">max</td>
+                                        <td valign="bottom">AVG: {max.toFixed(4)}</td>
                                     </tr>
                                 </table>
                             </div>

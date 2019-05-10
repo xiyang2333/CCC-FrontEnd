@@ -17,7 +17,8 @@
     "es6-promise": "^4.2.5",
     "react": "^16.3.0",
     "react-dom": "^16.3.0",
-    "react-google-maps": "^9.4.5"
+    "react-google-maps": "^9.4.5",
+    "whatwg-fetch": "^3.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
