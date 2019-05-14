@@ -48,7 +48,7 @@ class Curved extends React.Component {
                 type: "linear",
                 nice: true,
                 min : 0,
-                max : 0.6,
+                max : 0.4,
             }
         };
         return (
@@ -86,6 +86,7 @@ class Curved extends React.Component {
                         }}
                     />
                 </Chart>
+                <p>X value: Proportion of Anger Twitter; Y value: Number of people</p>
             </div>
         );
     }
