@@ -47,7 +47,7 @@ const styles = {
 
 const MyMapComponent = compose(
     withProps({
-        googleMapURL: "https://maps.googleapis.com/maps/api/js?key=AIzaSyBzePKpJhMUNanb890R2sYaUF6zDWJGUcI&v=3.exp&libraries=geometry,drawing,places&language=en-US",
+        googleMapURL: "https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&language=en-US",
         // googleMapURL: "https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places",
         loadingElement: <div style={{ height: `100%` }} />,
         containerElement: <div style={{ height: `800px` }} />,
@@ -199,7 +199,7 @@ class Map extends React.PureComponent {
             <p className={classes.word}>SA4 Code: {state.code}</p>
             <p className={classes.word}>SA4 Name: {state.name}</p>
             <p className={classes.word}>Anger proportion : {((state.sum / state.count)*100).toFixed(2) + "%"}</p>
-            <p className={classes.word}>Total Income: ${avg.toFixed(4)}</p>
+            <p className={classes.word}>Avg Income: ${avg.toFixed(2)}</p>
             <Labelline 
                 data = {data}
             />
